@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate clap;
+use colored::*;
 
 mod checkabspath;
 
@@ -16,10 +17,13 @@ fn main() {
     println!("check absolute path in : {}", folder);
     let res = check_codebase(folder.to_string());
     match res {
-        Ok(_) => std::process::exit(0),
+        Ok(_) => {
+            print!("[ {} ] not absolute paths", "OK".green().bold());
+            std::process::exit(0)
+        },
         Err(paths) => {
             for path in paths {
-                println!("{:?}", path);
+                println!("{}", path);
             }
             std::process::exit(-1)
         }
