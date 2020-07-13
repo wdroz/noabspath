@@ -1,15 +1,21 @@
 use glob::glob;
 use rayon::prelude::*;
+use colored::*;
 use regex::Regex;
 use std::path::{Path, PathBuf};
 use std::fs;
+use std::fmt;
 
-
-#[derive(Debug)]
 pub struct PathFinded {
     filepath: String,
     line_number: u64,
     path: String,
+}
+
+impl fmt::Display for PathFinded{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[ {} ] File {:<20} line {:>04} --> {:<20}", "x".red().bold(), self.filepath, self.line_number, self.path)
+    }
 }
 
 pub fn check_codebase(path: String) -> Result<(), Vec<PathFinded>> {
