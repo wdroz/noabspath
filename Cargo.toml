@@ -1,8 +1,15 @@
 [package]
 name = "noabspath"
 version = "0.1.0"
-authors = ["William Droz"]
+authors = ["William Droz <william.droz.ch@gmail.com>"]
 edition = "2018"
+repository = "https://github.com/wdroz/noabspath"
+license-file = "LICENSE"
+readme = "README.md"
+homepage = "https://github.com/wdroz/noabspath"
+description = "Detect hard-coded absolute paths in codesbases"
+keywords = ["tools", "CI", "CICD", "CLI"]
+categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
