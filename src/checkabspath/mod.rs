@@ -86,3 +86,25 @@ fn check_one_file(file: &Path, set: &Vec<Regex>) -> Option<Vec<PathFinded>> {
         }
     }
 }
+
+// tests
+
+#[cfg(test)]
+mod checkabspath {
+    use super::*;
+
+    #[test]
+    fn test_check_one_file_regex_find() {
+        let set = vec![Regex::new(r"William Droz").unwrap()];
+        let my_file = Path::new("src/checkabspath/mod.rs");
+        let res = check_one_file(&my_file, &set);
+        assert!(res.is_some())
+    }
+    #[test]
+    fn test_check_one_file_regex_not_find() {
+        let set = vec![Regex::new(r"William Droz").unwrap()];
+        let my_file = Path::new(".gitignore");
+        let res = check_one_file(&my_file, &set);
+        assert!(res.is_none())
+    }
+}
