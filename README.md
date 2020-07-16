@@ -2,7 +2,7 @@
 
 **noabspath** search and highlight all absolute paths detected.
 
-<p align="center"><img src="/img/demo.gif?raw=true"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/wdroz/noabspath/master/img/demo.gif"/></p>
 
 ## Usage
 
