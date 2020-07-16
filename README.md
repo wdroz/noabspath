@@ -10,7 +10,7 @@ William Droz <william.droz.ch@gmail.com>
 check that there aren't absolute paths in codebases
 
 USAGE:
-    noabspath.exe <PATH>
+    noabspath <PATH>
 
 FLAGS:
     -h, --help       Prints help information
@@ -18,7 +18,6 @@ FLAGS:
 
 ARGS:
     <PATH>    path of codebase to check
-</pre>
 
 ## Use case
 
