@@ -18,7 +18,7 @@ fn main() {
     let res = check_codebase(folder.to_string());
     match res {
         Ok(_) => {
-            print!("[ {} ] not absolute paths", "OK".green().bold());
+            println!("[ {} ] not absolute paths", "OK".green().bold());
             std::process::exit(0)
         },
         Err(paths) => {
