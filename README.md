@@ -2,6 +2,8 @@
 
 **noabspath** search and highlight all absolute paths detected.
 
+<p align="center"><img src="/img/demo.gif?raw=true"/></p>
+
 ## Usage
 
 <pre>
