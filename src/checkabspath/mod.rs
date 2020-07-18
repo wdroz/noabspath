@@ -55,30 +55,33 @@ fn check_entry(path: &Path, set: &Vec<Regex>) -> Option<Vec<PathFinded>>
     }
 }
 
+fn fill_from_content(lines: &String, set: &Vec<Regex>, file: &Path) -> Vec<PathFinded> {
+    let mut res = std::vec::Vec::new();
+    for (nb, line) in lines.lines().enumerate(){
+        for regex in set {
+            for caps in regex.captures_iter(&line) {
+                for cap in caps.iter() {
+                    res.push(PathFinded {
+                        filepath: file.to_str().unwrap().to_string(), 
+                        line_number: 1+nb as u64, 
+                        path: cap.unwrap().as_str().to_string(),
+                        });
+                }
+            }
+        }
+    }
+    res
+}
+
 fn check_one_file(file: &Path, set: &Vec<Regex>) -> Option<Vec<PathFinded>> {
     let contents = fs::read_to_string(file);
     match contents {
         Ok(lines) => {
-            let mut res = std::vec::Vec::new();
-            for (nb, line) in lines.lines().enumerate(){
-                for regex in set {
-                    for caps in regex.captures_iter(&line) {
-                        for cap in caps.iter() {
-                            res.push(PathFinded {
-                                filepath: file.to_str().unwrap().to_string(), 
-                                line_number: 1+nb as u64, 
-                                path: cap.unwrap().as_str().to_string(),
-                                });
-                        }
-                    }
-                }
-            }
+            let res = fill_from_content(&lines, set, file);
             match res.is_empty() {
                 true => None,
                 false => Some(res)
             }
-        
-            
         }
         Err(_) => {
             //println!("can't read {:?}", file);
