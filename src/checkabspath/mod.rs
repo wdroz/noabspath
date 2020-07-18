@@ -84,7 +84,6 @@ fn check_one_file(file: &Path, set: &Vec<Regex>) -> Option<Vec<PathFinded>> {
             }
         }
         Err(_) => {
-            //println!("can't read {:?}", file);
             None
         }
     }
