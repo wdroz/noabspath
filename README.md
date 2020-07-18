@@ -7,7 +7,7 @@
 ## Usage
 
 <pre>
-noabspath 0.1.2
+noabspath 0.1.3
 William Droz <william.droz.ch@gmail.com>
 check that there aren't absolute paths in codebases
 
