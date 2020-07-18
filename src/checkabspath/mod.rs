@@ -6,9 +6,13 @@ use std::path::{Path, PathBuf};
 use std::fs;
 use std::fmt;
 
+/// When a path is found
 pub struct PathFinded {
+    /// The path to where the file is
     filepath: String,
+    /// The line number on the path
     line_number: u64,
+    /// The path that the regex found
     path: String,
 }
 
@@ -18,6 +22,12 @@ impl fmt::Display for PathFinded{
     }
 }
 
+/// Check if a codebase has any absolute paths
+///
+/// # Arguments
+///
+/// * `path` - The location of the codebase
+///
 pub fn check_codebase(path: String) -> Result<(), Vec<PathFinded>> {
     let set = vec![Regex::new("[\"']/\\w+/?[^'\"]+[\"']").unwrap(),
                    Regex::new("[\"']\\\\w+\\?[^'\"]+[\"']").unwrap(),];
@@ -39,6 +49,13 @@ pub fn check_codebase(path: String) -> Result<(), Vec<PathFinded>> {
     }
 }
 
+/// Check if this entry has any absolute paths, if this is a folder, no nothing
+/// 
+/// # Arguments
+///
+/// * `path` - Location of the file
+/// * `set` - Vector of Regex that will be use to search for absolute paths
+///
 fn check_entry(path: &Path, set: &Vec<Regex>) -> Option<Vec<PathFinded>>
 {
     let metadata = path.metadata();
@@ -55,6 +72,14 @@ fn check_entry(path: &Path, set: &Vec<Regex>) -> Option<Vec<PathFinded>>
     }
 }
 
+/// Check if the string has any absolute paths
+/// 
+/// # Arguments
+///
+/// * `lines` - Content of a file
+/// * `set` - Vector of Regex that will be use to search for absolute paths
+/// * `file` - Path to the initial file (useful to build PathFinded instances)
+///
 fn fill_from_content(lines: &String, set: &Vec<Regex>, file: &Path) -> Vec<PathFinded> {
     let mut res = std::vec::Vec::new();
     for (nb, line) in lines.lines().enumerate(){
@@ -73,6 +98,13 @@ fn fill_from_content(lines: &String, set: &Vec<Regex>, file: &Path) -> Vec<PathF
     res
 }
 
+/// Check if this file has any absolute paths
+/// 
+/// # Arguments
+///
+/// * `path` - Location of the file
+/// * `set` - Vector of Regex that will be use to search for absolute paths
+///
 fn check_one_file(file: &Path, set: &Vec<Regex>) -> Option<Vec<PathFinded>> {
     let contents = fs::read_to_string(file);
     match contents {
