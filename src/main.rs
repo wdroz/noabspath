@@ -8,7 +8,7 @@ use checkabspath::check_codebase;
 
 fn main() {
     let matches = clap_app!(noabspath =>
-        (version: "0.1.4")
+        (version: "0.1.5")
         (author: "William Droz <william.droz.ch@gmail.com>")
         (about: "check that there aren't absolute paths in codebases")
         (@arg PATH: +required "path of codebase to check")
