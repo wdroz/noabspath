@@ -18,6 +18,9 @@ FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
 
+OPTIONS:
+    -i, --ignore_file <IGNORE_FILE>    File that contains patterns to ignore (default .gitignore)
+
 ARGS:
     <PATH>    path of codebase to check
 
