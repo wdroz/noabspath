@@ -64,6 +64,17 @@ impl PathDetection for RegExSetForPath {
     }
 }
 
+/// Create default set of regexes to search for absolute paths
+///
+fn create_regexes_for_abs_paths() -> RegExSetForPath {
+    RegExSetForPath {
+        regex_set: vec![
+            RegExForPath {regex: Regex::new("[\"']/\\w+/?[^'\"]+[\"']").unwrap()},
+            RegExForPath {regex: Regex::new("[\"']\\\\w+\\?[^'\"]+[\"']").unwrap()},
+        ],
+    }
+}
+
 /// Check if a codebase has any absolute paths
 ///
 /// # Arguments
@@ -71,12 +82,7 @@ impl PathDetection for RegExSetForPath {
 /// * `path` - The location of the codebase
 ///
 pub fn check_codebase(path: String) -> Result<(), Vec<PathFinded>> {
-    let set = RegExSetForPath {
-        regex_set: vec![
-            RegExForPath {regex: Regex::new("[\"']/\\w+/?[^'\"]+[\"']").unwrap()},
-            RegExForPath {regex: Regex::new("[\"']\\\\w+\\?[^'\"]+[\"']").unwrap()},
-        ],
-    };
+    let set = create_regexes_for_abs_paths();
     let mut glob_expression = path;
     if glob_expression.ends_with("/") {
         glob_expression.push_str("**/*");
