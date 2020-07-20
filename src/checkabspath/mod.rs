@@ -5,7 +5,7 @@ use regex::Regex;
 use std::path::{Path, PathBuf};
 use std::fs;
 use std::fmt;
-
+use wildmatch::WildMatch;
 /// Simple trait to detect if the path exist from a string. Return empty string if no match
 pub trait PathDetection {
     fn path_exist(&self, line: &String) -> String;
@@ -64,6 +64,26 @@ impl PathDetection for RegExSetForPath {
     }
 }
 
+fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
+    let contents = fs::read_to_string(filename);
+    match contents {
+        Ok(lines) => {
+            let res : Vec<WildMatch> = lines.lines().into_iter().map(|x| format!("*{}*", x)).map(|x| WildMatch::new(&x)).collect();
+            Some(res)
+        }
+        Err(_) => None,
+    }
+}
+
+fn maybe_ignore(path: &Path, wildmatches: &Vec<WildMatch>) -> bool {
+    for wildmatch in wildmatches{
+        if wildmatch.is_match(path.to_str().unwrap()) {
+            return false;
+        }
+    }
+    true
+}
+
 /// Create default set of regexes to search for absolute paths
 ///
 fn create_regexes_for_abs_paths() -> RegExSetForPath {
@@ -81,7 +101,7 @@ fn create_regexes_for_abs_paths() -> RegExSetForPath {
 ///
 /// * `path` - The location of the codebase
 ///
-pub fn check_codebase(path: String) -> Result<(), Vec<PathFinded>> {
+pub fn check_codebase(path: String, ignore_file: String) -> Result<(), Vec<PathFinded>> {
     let set = create_regexes_for_abs_paths();
     let mut glob_expression = path;
     if glob_expression.ends_with("/") {
@@ -91,7 +111,12 @@ pub fn check_codebase(path: String) -> Result<(), Vec<PathFinded>> {
         glob_expression.push_str("/**/*");
     }
     let potential_files: Vec<PathBuf> = glob(&glob_expression).unwrap().into_iter().map(|x| x.unwrap()).collect();
-    let entries: Vec<Vec<PathFinded>> = potential_files.par_iter().map(move |entry| check_entry(&entry, &set)).flatten().collect();
+    let wildmatches = create_wildmatches_from_file(ignore_file);
+    let potential_files_filtered = match wildmatches {
+        Some(matches) => potential_files.into_iter().filter(|x| maybe_ignore(x, &matches)).collect(),
+        None => potential_files
+    };
+    let entries: Vec<Vec<PathFinded>> = potential_files_filtered.par_iter().map(move |entry| check_entry(&entry, &set)).flatten().collect();
     
     if entries.is_empty() {
         return Ok(());
