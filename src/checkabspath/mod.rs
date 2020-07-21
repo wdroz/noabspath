@@ -75,6 +75,8 @@ fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
     }
 }
 
+/// Returns false if there is a match, true otherwise
+///
 fn maybe_ignore(path: &Path, wildmatches: &Vec<WildMatch>) -> bool {
     for wildmatch in wildmatches{
         if wildmatch.is_match(path.to_str().unwrap()) {
