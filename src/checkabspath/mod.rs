@@ -64,6 +64,9 @@ impl PathDetection for RegExSetForPath {
     }
 }
 
+/// Read .gitignore style file and return a Vec of WildMatch.
+/// If the there is an error when reading the file, return None
+///
 fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
     let contents = fs::read_to_string(filename);
     match contents {
