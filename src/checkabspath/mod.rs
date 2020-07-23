@@ -71,7 +71,7 @@ fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
     let contents = fs::read_to_string(filename);
     match contents {
         Ok(lines) => {
-            let res : Vec<WildMatch> = lines.lines().into_iter().map(|x| format!("*{}*", x)).map(|x| WildMatch::new(&x)).collect();
+            let res : Vec<WildMatch> = lines.lines().into_iter().par_bridge().map(|x| format!("*{}*", x)).map(|x| WildMatch::new(&x)).collect();
             Some(res)
         }
         Err(_) => None,
@@ -118,7 +118,7 @@ pub fn check_codebase(path: String, ignore_file: String) -> Result<(), Vec<PathF
     let potential_files: Vec<PathBuf> = glob(&glob_expression).unwrap().into_iter().map(|x| x.unwrap()).collect();
     let wildmatches = create_wildmatches_from_file(ignore_file);
     let potential_files_filtered = match wildmatches {
-        Some(matches) => potential_files.into_iter().filter(|x| maybe_ignore(x, &matches)).collect(),
+        Some(matches) => potential_files.into_iter().par_bridge().filter(|x| maybe_ignore(x, &matches)).collect(),
         None => potential_files
     };
     let entries: Vec<Vec<PathFinded>> = potential_files_filtered.par_iter().map(move |entry| check_entry(&entry, &set)).flatten().collect();
