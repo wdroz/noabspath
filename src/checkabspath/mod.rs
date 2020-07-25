@@ -1,10 +1,10 @@
+use colored::*;
 use glob::glob;
 use rayon::prelude::*;
-use colored::*;
 use regex::Regex;
-use std::path::{Path, PathBuf};
-use std::fs;
 use std::fmt;
+use std::fs;
+use std::path::{Path, PathBuf};
 use wildmatch::WildMatch;
 /// Simple trait to detect if the path exist from a string. Return empty string if no match
 pub trait PathDetection {
@@ -21,9 +21,16 @@ pub struct PathFinded {
     path: String,
 }
 
-impl fmt::Display for PathFinded{
+impl fmt::Display for PathFinded {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[ {} ] File {:<20} line {:>04} --> {:<20}", "x".red().bold(), self.filepath, self.line_number, self.path)
+        write!(
+            f,
+            "[ {} ] File {:<20} line {:>04} --> {:<20}",
+            "x".red().bold(),
+            self.filepath,
+            self.line_number,
+            self.path
+        )
     }
 }
 /// Specific regex for paths
@@ -34,7 +41,7 @@ pub struct RegExForPath {
 /// Use internal regex to check for a path
 impl PathDetection for RegExForPath {
     fn path_exist(&self, line: &String) -> String {
-        let mut res: String = String::from(""); 
+        let mut res: String = String::from("");
         for caps in self.regex.captures_iter(line) {
             for cap in caps.iter() {
                 res = cap.unwrap().as_str().to_string();
@@ -43,7 +50,6 @@ impl PathDetection for RegExForPath {
         }
         res
     }
-    
 }
 /// Set of specific regex for paths
 pub struct RegExSetForPath {
@@ -53,10 +59,10 @@ pub struct RegExSetForPath {
 /// Use all specific regex in a loop to search for paths
 impl PathDetection for RegExSetForPath {
     fn path_exist(&self, line: &String) -> String {
-        let mut res: String = String::from(""); 
+        let mut res: String = String::from("");
         for regex in &self.regex_set[..] {
             res = regex.path_exist(line);
-            if !res.is_empty(){
+            if !res.is_empty() {
                 return res;
             }
         }
@@ -71,7 +77,13 @@ fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
     let contents = fs::read_to_string(filename);
     match contents {
         Ok(lines) => {
-            let res : Vec<WildMatch> = lines.lines().into_iter().par_bridge().map(|x| format!("*{}*", x)).map(|x| WildMatch::new(&x)).collect();
+            let res: Vec<WildMatch> = lines
+                .lines()
+                .into_iter()
+                .par_bridge()
+                .map(|x| format!("*{}*", x))
+                .map(|x| WildMatch::new(&x))
+                .collect();
             Some(res)
         }
         Err(_) => None,
@@ -81,7 +93,7 @@ fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
 /// Returns false if there is a match, true otherwise
 ///
 fn maybe_ignore(path: &Path, wildmatches: &Vec<WildMatch>) -> bool {
-    for wildmatch in wildmatches{
+    for wildmatch in wildmatches {
         if wildmatch.is_match(path.to_str().unwrap()) {
             return false;
         }
@@ -94,8 +106,12 @@ fn maybe_ignore(path: &Path, wildmatches: &Vec<WildMatch>) -> bool {
 fn create_regexes_for_abs_paths() -> RegExSetForPath {
     RegExSetForPath {
         regex_set: vec![
-            RegExForPath {regex: Regex::new("[\"']/\\w+/?[^'\"]+[\"']").unwrap()},
-            RegExForPath {regex: Regex::new("[\"']\\\\w+\\?[^'\"]+[\"']").unwrap()},
+            RegExForPath {
+                regex: Regex::new("[\"']/\\w+/?[^'\"]+[\"']").unwrap(),
+            },
+            RegExForPath {
+                regex: Regex::new("[\"']\\\\w+\\?[^'\"]+[\"']").unwrap(),
+            },
         ],
     }
 }
@@ -111,42 +127,50 @@ pub fn check_codebase(path: String, ignore_file: String) -> Result<(), Vec<PathF
     let mut glob_expression = path;
     if glob_expression.ends_with("/") {
         glob_expression.push_str("**/*");
-    }
-    else {
+    } else {
         glob_expression.push_str("/**/*");
     }
-    let potential_files: Vec<PathBuf> = glob(&glob_expression).unwrap().into_iter().map(|x| x.unwrap()).collect();
+    let potential_files: Vec<PathBuf> = glob(&glob_expression)
+        .unwrap()
+        .into_iter()
+        .map(|x| x.unwrap())
+        .collect();
     let wildmatches = create_wildmatches_from_file(ignore_file);
     let potential_files_filtered = match wildmatches {
-        Some(matches) => potential_files.into_iter().par_bridge().filter(|x| maybe_ignore(x, &matches)).collect(),
-        None => potential_files
+        Some(matches) => potential_files
+            .into_iter()
+            .par_bridge()
+            .filter(|x| maybe_ignore(x, &matches))
+            .collect(),
+        None => potential_files,
     };
-    let entries: Vec<Vec<PathFinded>> = potential_files_filtered.par_iter().map(move |entry| check_entry(&entry, &set)).flatten().collect();
-    
+    let entries: Vec<Vec<PathFinded>> = potential_files_filtered
+        .par_iter()
+        .map(move |entry| check_entry(&entry, &set))
+        .flatten()
+        .collect();
+
     if entries.is_empty() {
         return Ok(());
-    }
-    else {
+    } else {
         return Err(entries.into_iter().flatten().collect());
     }
 }
 
 /// Check if this entry has any absolute paths, if this is a folder, no nothing
-/// 
+///
 /// # Arguments
 ///
 /// * `path` - Location of the file
 /// * `set` - Implementation of PathDetection that will be use to search for absolute paths
 ///
-fn check_entry(path: &Path, set: &impl PathDetection) -> Option<Vec<PathFinded>>
-{
+fn check_entry(path: &Path, set: &impl PathDetection) -> Option<Vec<PathFinded>> {
     let metadata = path.metadata();
     match metadata {
         Ok(x) => {
             if x.is_file() {
                 check_one_file(path, set)
-            }
-            else {
+            } else {
                 None
             }
         }
@@ -155,7 +179,7 @@ fn check_entry(path: &Path, set: &impl PathDetection) -> Option<Vec<PathFinded>>
 }
 
 /// Check if the string has any absolute paths
-/// 
+///
 /// # Arguments
 ///
 /// * `lines` - Content of a file
@@ -164,21 +188,21 @@ fn check_entry(path: &Path, set: &impl PathDetection) -> Option<Vec<PathFinded>>
 ///
 fn fill_from_content(lines: &String, set: &impl PathDetection, file: &Path) -> Vec<PathFinded> {
     let mut res = std::vec::Vec::new();
-    for (nb, line) in lines.lines().enumerate(){
+    for (nb, line) in lines.lines().enumerate() {
         let path = set.path_exist(&line.into());
-        if !path.is_empty(){
+        if !path.is_empty() {
             res.push(PathFinded {
-                filepath: file.to_str().unwrap().to_string(), 
-                line_number: 1+nb as u64, 
+                filepath: file.to_str().unwrap().to_string(),
+                line_number: 1 + nb as u64,
                 path: path,
-                });
+            });
         }
     }
     res
 }
 
 /// Check if this file has any absolute paths
-/// 
+///
 /// # Arguments
 ///
 /// * `path` - Location of the file
@@ -191,12 +215,10 @@ fn check_one_file(file: &Path, set: &impl PathDetection) -> Option<Vec<PathFinde
             let res = fill_from_content(&lines, set, file);
             match res.is_empty() {
                 true => None,
-                false => Some(res)
+                false => Some(res),
             }
         }
-        Err(_) => {
-            None
-        }
+        Err(_) => None,
     }
 }
 
@@ -208,14 +230,18 @@ mod checkabspath {
 
     #[test]
     fn test_check_one_file_regex_find() {
-        let regex = RegExForPath {regex: Regex::new(r"William Droz").unwrap()};
+        let regex = RegExForPath {
+            regex: Regex::new(r"William Droz").unwrap(),
+        };
         let my_file = Path::new("src/checkabspath/mod.rs");
         let res = check_one_file(&my_file, &regex);
         assert!(res.is_some())
     }
     #[test]
     fn test_check_one_file_regex_not_find() {
-        let regex = RegExForPath {regex: Regex::new(r"William Droz").unwrap()};
+        let regex = RegExForPath {
+            regex: Regex::new(r"William Droz").unwrap(),
+        };
         let my_file = Path::new(".gitignore");
         let res = check_one_file(&my_file, &regex);
         assert!(res.is_none())

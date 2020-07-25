@@ -15,14 +15,17 @@ fn main() {
         (@arg IGNORE_FILE: -i --ignore_file +takes_value "File that contains patterns to ignore (default .gitignore)")
     ).get_matches();
     let folder = matches.value_of("PATH").unwrap();
-    let ignore_file = matches.value_of("IGNORE_FILE").unwrap_or(".gitignore").to_string();
+    let ignore_file = matches
+        .value_of("IGNORE_FILE")
+        .unwrap_or(".gitignore")
+        .to_string();
     println!("check absolute path in : {}", folder);
     let res = check_codebase(folder.to_string(), ignore_file);
     match res {
         Ok(_) => {
             println!("[ {} ] not absolute paths", "OK".green().bold());
             std::process::exit(0)
-        },
+        }
         Err(paths) => {
             for path in paths {
                 println!("{}", path);
