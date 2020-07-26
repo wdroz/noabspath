@@ -1,0 +1,25 @@
+name: noabspath
+version: git
+summary: Detect hard-coded absolute paths in codesbases, written in Rust
+description: |
+  noabspath is a cli tools, useful in CI, to ensure that there aren't any hard-coded absolute path in your codesbases.
+  by default, noabspath use .gitignore if it existe to check only relevant files.
+
+base: core20
+confinement: strict
+
+
+parts:
+  noabspath:
+    plugin: rust
+    source: .
+    build-packages:
+        - gcc
+        - libc6
+        - libc6-dev
+    stage-packages:
+        - libc6
+
+apps:
+  noabspath:
+    command: bin/noabspath
