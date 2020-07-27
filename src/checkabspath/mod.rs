@@ -74,7 +74,7 @@ impl PathDetection for RegExSetForPath {
 /// If the there is an error when reading the file, return None
 ///
 fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
-    let contents = fs::read_to_string(filename);
+    let contents = fs::read_to_string(filename.clone());
     match contents {
         Ok(lines) => {
             let res: Vec<WildMatch> = lines
@@ -86,7 +86,10 @@ fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
                 .collect();
             Some(res)
         }
-        Err(_) => None,
+        Err(_) => {
+            eprintln!("Warning: Unable to read {}. ignoring", filename.clone());
+            None
+        }
     }
 }
 
