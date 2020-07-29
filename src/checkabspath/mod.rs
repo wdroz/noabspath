@@ -191,11 +191,13 @@ fn fill_from_content(lines: &String, set: &impl PathDetection, file: &Path) -> V
     for (nb, line) in lines.lines().enumerate() {
         let path = set.path_exist(&line.into());
         if !path.is_empty() {
-            res.push(PathFinded {
-                filepath: file.to_str().unwrap().to_string(),
-                line_number: 1 + nb as u64,
-                path: path,
-            });
+            if let Some(filepath) = file.to_str() {
+                res.push(PathFinded {
+                    filepath: filepath.to_string(),
+                    line_number: 1 + nb as u64,
+                    path: path,
+                });
+            }
         }
     }
     res
