@@ -177,7 +177,13 @@ fn check_entry(path: &Path, set: &impl PathDetection) -> Option<Vec<PathFinded>>
                 None
             }
         }
-        Err(_) => None,
+        Err(_) => {
+            eprintln!(
+                "Warning: Unable to read metadata of {}. ignoring",
+                path.to_str().unwrap()
+            );
+            None
+        }
     }
 }
 
