@@ -9,7 +9,7 @@
 <pre>
 noabspath 0.1.6
 William Droz <william.droz.ch@gmail.com>
-check that there aren't absolute paths in codebases
+check that there aren't obvious absolute paths in codebases
 
 USAGE:
     noabspath <PATH>

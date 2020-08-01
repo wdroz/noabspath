@@ -10,7 +10,7 @@ fn main() {
     let matches = clap_app!(noabspath =>
         (version: "0.1.6")
         (author: "William Droz <william.droz.ch@gmail.com>")
-        (about: "check that there aren't absolute paths in codebases")
+        (about: "check that there aren't obvious absolute paths in codebases")
         (@arg PATH: +required "path of codebase to check")
         (@arg IGNORE_FILE: -i --ignore_file +takes_value "File that contains patterns to ignore (default .gitignore)")
     ).get_matches();
