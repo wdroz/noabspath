@@ -93,15 +93,15 @@ fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
     }
 }
 
-/// Returns false if there is a match, true otherwise
+/// Returns true if there is a match, false otherwise
 ///
-fn maybe_ignore(path: &Path, wildmatches: &Vec<WildMatch>) -> bool {
+fn is_ignored(path: &Path, wildmatches: &Vec<WildMatch>) -> bool {
     for wildmatch in wildmatches {
         if wildmatch.is_match(path.to_str().unwrap()) {
-            return false;
+            return true;
         }
     }
-    true
+    false
 }
 
 /// Create default set of regexes to search for absolute paths
@@ -143,7 +143,7 @@ pub fn check_codebase(path: String, ignore_file: String) -> Result<(), Vec<PathF
         Some(matches) => potential_files
             .into_iter()
             .par_bridge()
-            .filter(|x| maybe_ignore(x, &matches))
+            .filter(|x| !is_ignored(x, &matches))
             .collect(),
         None => potential_files,
     };
