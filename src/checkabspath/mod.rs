@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 use wildmatch::WildMatch;
 /// Simple trait to detect if the path exist from a string. Return empty string if no match
 pub trait PathDetection {
-    fn path_exist(&self, line: &String) -> String;
+    fn path_exist(&self, line: &str) -> String;
 }
 
 /// When a path is found
@@ -40,7 +40,7 @@ pub struct RegExForPath {
 
 /// Use internal regex to check for a path
 impl PathDetection for RegExForPath {
-    fn path_exist(&self, line: &String) -> String {
+    fn path_exist(&self, line: &str) -> String {
         let mut res: String = String::from("");
         for caps in self.regex.captures_iter(line) {
             for cap in caps.iter() {
@@ -58,7 +58,7 @@ pub struct RegExSetForPath {
 
 /// Use all specific regex in a loop to search for paths
 impl PathDetection for RegExSetForPath {
-    fn path_exist(&self, line: &String) -> String {
+    fn path_exist(&self, line: &str) -> String {
         let mut res: String = String::from("");
         for regex in &self.regex_set[..] {
             res = regex.path_exist(line);
@@ -154,9 +154,9 @@ pub fn check_codebase(path: String, ignore_file: String) -> Result<(), Vec<PathF
         .collect();
 
     if entries.is_empty() {
-        return Ok(());
+        Ok(())
     } else {
-        return Err(entries.into_iter().flatten().collect());
+        Err(entries.into_iter().flatten().collect())
     }
 }
 
@@ -198,13 +198,13 @@ fn check_entry(path: &Path, set: &impl PathDetection) -> Option<Vec<PathFinded>>
 fn fill_from_content(lines: &String, set: &impl PathDetection, file: &Path) -> Vec<PathFinded> {
     let mut res = std::vec::Vec::new();
     for (nb, line) in lines.lines().enumerate() {
-        let path = set.path_exist(&line.into());
+        let path = set.path_exist(&line);
         if !path.is_empty() {
             if let Some(filepath) = file.to_str() {
                 res.push(PathFinded {
                     filepath: filepath.to_string(),
                     line_number: 1 + nb as u64,
-                    path: path,
+                    path,
                 });
             }
         }
