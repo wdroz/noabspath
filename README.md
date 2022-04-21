@@ -7,22 +7,17 @@
 ## Usage
 
 <pre>
-noabspath 0.1.6
 William Droz <william.droz.ch@gmail.com>
-check that there aren't obvious absolute paths in codebases
+Detect hard-coded absolute paths in codesbases
 
 USAGE:
-    noabspath <PATH>
-
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    noabspath [OPTIONS]
 
 OPTIONS:
-    -i, --ignore_file <IGNORE_FILE>    File that contains patterns to ignore (default .gitignore)
-
-ARGS:
-    <PATH>    path of codebase to check
+    -h, --help                         Print help information
+    -i, --ignore-file <IGNORE_FILE>    File that contains patterns to ignore [default: .gitignore]
+    -p, --path <PATH>                  Path of codebase to check [default: .]
+    -V, --version                      Print version information
 
 </pre>
 
