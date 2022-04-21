@@ -97,7 +97,7 @@ fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
 ///
 fn is_ignored(path: &Path, wildmatches: &Vec<WildMatch>) -> bool {
     for wildmatch in wildmatches {
-        if wildmatch.is_match(path.to_str().unwrap()) {
+        if wildmatch.matches(path.to_str().unwrap()) {
             return true;
         }
     }
