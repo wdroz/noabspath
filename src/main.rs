@@ -9,7 +9,7 @@ use checkabspath::check_codebase;
 #[clap(author, version, about, long_about = None)]
 struct Args {
     /// Path of codebase to check
-    #[clap(short, long)]
+    #[clap(short, long, default_value = ".")]
     path: String,
 
     /// File that contains patterns to ignore
