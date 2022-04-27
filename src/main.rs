@@ -17,7 +17,6 @@ struct Args {
     ignore_file: String,
 }
 
-
 fn main() {
     let args = Args::parse();
     let folder = args.path;
