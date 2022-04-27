@@ -25,3 +25,16 @@ OPTIONS:
 
 The most common use case is to use **noabspath** in your CI pipeline.
 
+## Install
+
+### Cargo
+
+```bash
+cargo install noabspath
+```
+
+### Snap
+
+```bash
+sudo snap install noabspath
+```
