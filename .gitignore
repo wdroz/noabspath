@@ -4,3 +4,4 @@ Cargo.lock
 snap/
 parts/
 *.snap
+exported.txt
