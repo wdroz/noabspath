@@ -36,5 +36,11 @@ cargo install noabspath
 ### Snap
 
 ```bash
+sudo snap install noabspath
+```
+
+or
+
+```bash
 sudo snap install noabspath --edge
 ```
