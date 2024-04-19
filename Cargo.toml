@@ -2,7 +2,7 @@
 name = "noabspath"
 version = "1.0.1"
 authors = ["William Droz <william.droz.ch@gmail.com>"]
-edition = "2018"
+edition = "2021"
 repository = "https://github.com/wdroz/noabspath"
 license = "GPL-3.0-or-later"
 readme = "README.md"
@@ -16,7 +16,7 @@ categories = ["command-line-utilities"]
 [dependencies]
 clap = { version = "3.1.10", features = ["derive"] }
 glob = "~0.3.0"
-rayon = "~1.5.2"
-regex = "~1.5.5"
-colored = "~2.0.0"
-wildmatch = "~2.1.0"
+rayon = "~1"
+regex = "~1"
+colored = "~2"
+wildmatch = "~2"
