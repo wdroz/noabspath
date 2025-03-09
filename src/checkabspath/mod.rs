@@ -43,7 +43,7 @@ impl PathDetection for RegExForPath {
     fn path_exist(&self, line: &str) -> String {
         let mut res: String = String::from("");
         for caps in self.regex.captures_iter(line) {
-            for cap in caps.iter() {
+            if let Some(cap) = caps.iter().next() {
                 res = cap.unwrap().as_str().to_string();
                 return res;
             }
@@ -79,7 +79,6 @@ fn create_wildmatches_from_file(filename: String) -> Option<Vec<WildMatch>> {
         Ok(lines) => {
             let res: Vec<WildMatch> = lines
                 .lines()
-                .into_iter()
                 .par_bridge()
                 .map(|x| format!("*{}*", x))
                 .map(|x| WildMatch::new(&x))
@@ -141,7 +140,6 @@ pub fn check_codebase(path: String, ignore_file: String) -> Result<(), Vec<PathF
     }
     let potential_files: Vec<PathBuf> = glob(&glob_expression)
         .unwrap()
-        .into_iter()
         .map(|x| x.unwrap())
         .collect();
     let wildmatches = create_wildmatches_from_file(ignore_file);
@@ -155,7 +153,7 @@ pub fn check_codebase(path: String, ignore_file: String) -> Result<(), Vec<PathF
     };
     let entries: Vec<Vec<PathFinded>> = potential_files_filtered
         .par_iter()
-        .map(move |entry| check_entry(&entry, &set))
+        .map(move |entry| check_entry(entry, &set))
         .flatten()
         .collect();
 
@@ -201,10 +199,10 @@ fn check_entry(path: &Path, set: &impl PathDetection) -> Option<Vec<PathFinded>>
 /// * `set` - Implementation of PathDetection that will be use to search for absolute paths
 /// * `file` - Path to the initial file (useful to build PathFinded instances)
 ///
-fn fill_from_content(lines: &String, set: &impl PathDetection, file: &Path) -> Vec<PathFinded> {
+fn fill_from_content(lines: &str, set: &impl PathDetection, file: &Path) -> Vec<PathFinded> {
     let mut res = std::vec::Vec::new();
     for (nb, line) in lines.lines().enumerate() {
-        let path = set.path_exist(&line);
+        let path = set.path_exist(line);
         if !path.is_empty() {
             if let Some(filepath) = file.to_str() {
                 res.push(PathFinded {
