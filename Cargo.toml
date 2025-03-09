@@ -1,6 +1,6 @@
 [package]
 name = "noabspath"
-version = "1.0.3"
+version = "1.0.4"
 authors = ["William Droz <william.droz.ch@gmail.com>"]
 edition = "2024"
 repository = "https://github.com/wdroz/noabspath"
