@@ -109,11 +109,17 @@ fn is_ignored(path: &Path, wildmatches: &Vec<WildMatch>) -> bool {
 fn create_regexes_for_abs_paths() -> RegExSetForPath {
     RegExSetForPath {
         regex_set: vec![
+            // Unix absolute paths: e.g. "/usr/local/bin"
             RegExForPath {
-                regex: Regex::new("[\"']/\\w+/?[^'\"]+[\"']").unwrap(),
+                regex: Regex::new(r#"[\"']\/(?:[^\/'"]+\/)*[^\/'"]+[\"']"#).unwrap(),
             },
+            // Windows absolute paths with drive letter: e.g. "C:\Program Files\App"
             RegExForPath {
-                regex: Regex::new("[\"']\\\\w+\\?[^'\"]+[\"']").unwrap(),
+                regex: Regex::new(r#"[\"'][A-Za-z]:[\\/][^'"]+[\"']"#).unwrap(),
+            },
+            // Windows UNC paths: e.g. "\\server\share\folder"
+            RegExForPath {
+                regex: Regex::new(r#"[\"'](?:\\\\|//)[^\\/]+[\\/][^'"]+[\"']"#).unwrap(),
             },
         ],
     }
